@@ -1,5 +1,5 @@
 Arguments: 
-  /Users/lsj/.nvm/versions/node/v18.20.2/bin/node /usr/local/bin/yarn add pinia
+  /Users/lsj/.nvm/versions/node/v18.20.2/bin/node /usr/local/bin/yarn install
 
 PATH: 
   /Users/lsj/.trae-cn/sdks/workspaces/91670287/versions/node/current:/Users/lsj/.trae-cn/sdks/versions/node/current:/Users/lsj/.nvm/versions/node/v18.20.2/bin:/Users/lsj/Downloads/flutter/flutter/bin:/Users/lsj/.trae-cn/sdks/workspaces/91670287/versions/node/current:/Users/lsj/.trae-cn/sdks/versions/node/current:/usr/local/bin:/usr/local/sbin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Trae CN.app/Contents/Resources/app/bin:/Users/lsj/.trae-cn/sdks/workspaces/91670287/versions/node/current:/Users/lsj/.trae-cn/sdks/versions/node/current:/Users/lsj/.local/bin:/Users/lsj/.nvm/versions/node/v18.20.2/bin:/Users/lsj/Downloads/flutter/flutter/bin:/usr/local/sbin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Users/lsj/Library/Application Support/Trae CN/User/globalStorage/github.copilot-chat/debugCommand
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: EPERM: operation not permitted, mkdir '/Users/lsj/Downloads/lenovoEService/Environments/Node/Yarn/cache/v6/npm-entities-7.0.1-26e8a88889db63417dcb9a1e79a3f1bc92b5976b-integrity'
+  Error: EPERM: operation not permitted, mkdir '/Users/lsj/Downloads/lenovoEService/Environments/Node/Yarn/cache/v6/npm-vue-tsc-2.2.12-5f719b08ef7390a763c1a20169ca5c9d09d55688-integrity'
 
 npm manifest: 
   {
@@ -24,17 +24,19 @@ npm manifest:
     "type": "module",
     "scripts": {
       "dev": "vite",
-      "build": "vue-tsc && vite build",
+      "build": "vite build",
       "preview": "vite preview"
     },
     "dependencies": {
-      "vue": "^3.4.0"
+      "pinia": "^3.0.4",
+      "vue": "^3.4.0",
+      "vue-router": "^4.6.4"
     },
     "devDependencies": {
       "@vitejs/plugin-vue": "^5.0.0",
       "typescript": "^5.2.0",
       "vite": "^5.0.0",
-      "vue-tsc": "^1.8.0"
+      "vue-tsc": "^2.0.0"
     }
   }
 
