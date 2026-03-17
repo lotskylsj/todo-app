@@ -10,12 +10,18 @@
           class="flex-1 min-w-[200px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all"
         />
         <select
-          v-model="newTodoPriority"
+          v-model="selectedPriority"
           class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all min-w-[120px]"
         >
           <option value="high">高优先级</option>
-          <option value="medium">中优先级</option>
+          <option value="medium" >中优先级</option>
           <option value="low">低优先级</option>
+          <option value="loading" >
+            <svg class="animate-spin w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+              正在获取AI优先级...
+          </option>
         </select>
         <button
           @click="addTodo"
@@ -69,6 +75,7 @@
               {{ todo.text }}
             </p>
           </div>
+          <span class="text-yellow-500 font-medium flex items-center" v-if="todo.isAiSuggested">🤖 AI推荐</span>
           <div class="priority-badge" :class="`priority-${todo.priority}`">
             {{ todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低' }}
           </div>
@@ -126,6 +133,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { getPriority } from '../service/AiService'
 // 定义待办事项接口
 // 新增priority属性 用于设置待办事项的优先级 可选值为high、medium、low
 interface Todo {
@@ -134,12 +142,15 @@ interface Todo {
   completed: boolean
   priority: string // 新增优先级属性 可选值为high、medium、low  
   createdTime: number // 新增创建时间属性 用于排序
+  isAiSuggested: boolean // 新增是否为AI推荐属性 用于判断是否显示AI推荐图标
 }
 
 // 定义存储键
 const STORAGE_KEY = 'vue-todo-list'
 // 定义编辑状态
 const isEditing = ref(false)
+const loadingPriority = ref(false)
+
 const editingTodoId = ref<number | null>(null)
 // 定义tab状态
 const tab = ref('all')
@@ -173,7 +184,9 @@ const tabs = [
   }
 ]
 // 定义新增待办事项的优先级
-const newTodoPriority = ref('medium')
+const selectedPriority = ref('medium')
+// 定义 AI 推荐的优先级
+const aiSuggestedPriority = ref('')
 // 定义过滤后的待办事项
 // 1.根据创建时间倒序排序
 const filteredTodos = computed(() => {
@@ -200,17 +213,44 @@ const saveTodos = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(todos.value))
 }
 // 定义添加待办事项
-const addTodo = () => {
+const addTodo = async () => {
   const text = newTodo.value.trim()
   if (!text) return
-  todos.value.push({ id: Date.now(), text, completed: false, priority: newTodoPriority.value, createdTime: Date.now() })
+  let priority = selectedPriority.value
+  loadingPriority.value = true
+  selectedPriority.value = 'loading'
+  try {
+    const aiPriority = await getPriority(text)
+    if (aiPriority) {
+      // 加载状态结束
+      loadingPriority.value = false
+      // AI 直接返回 high/medium/low 格式，无需转换
+      priority = aiPriority
+      aiSuggestedPriority.value = aiPriority
+      // 默认选中 AI 推荐的优先级
+      selectedPriority.value = priority
+    }
+  } catch (error) {
+    console.error('获取AI优先级失败:', error)
+    // 加载状态结束
+    loadingPriority.value = false
+  }
+  todos.value.push({ 
+    id: Date.now(), text, completed: false, 
+    priority, createdTime: Date.now() ,
+    isAiSuggested: true
+  })
   newTodo.value = ''
   // 重置编辑状态
   isEditing.value = false
+  // 重置 AI 推荐的优先级
+  aiSuggestedPriority.value = ''
+  // 重置新增待办事项的优先级
+  selectedPriority.value = 'medium'
   saveTodos()
 }
 // 定义切换待办事项状态
-const toggleTodo = (id: number) => {
+const toggleTodo = async (id: number) => {
   const todo = todos.value.find(t => t.id === id)
   if (todo) {
     todo.completed = !todo.completed

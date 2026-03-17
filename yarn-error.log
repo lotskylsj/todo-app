@@ -1,20 +1,20 @@
 Arguments: 
-  /Users/lsj/.nvm/versions/node/v18.20.2/bin/node /usr/local/bin/yarn install
+  /Users/lsj/.nvm/versions/node/v18.17.0/bin/node /usr/local/bin/yarn add axios
 
 PATH: 
-  /Users/lsj/.trae-cn/sdks/workspaces/91670287/versions/node/current:/Users/lsj/.trae-cn/sdks/versions/node/current:/Users/lsj/.nvm/versions/node/v18.20.2/bin:/Users/lsj/Downloads/flutter/flutter/bin:/Users/lsj/.trae-cn/sdks/workspaces/91670287/versions/node/current:/Users/lsj/.trae-cn/sdks/versions/node/current:/usr/local/bin:/usr/local/sbin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Trae CN.app/Contents/Resources/app/bin:/Users/lsj/.trae-cn/sdks/workspaces/91670287/versions/node/current:/Users/lsj/.trae-cn/sdks/versions/node/current:/Users/lsj/.local/bin:/Users/lsj/.nvm/versions/node/v18.20.2/bin:/Users/lsj/Downloads/flutter/flutter/bin:/usr/local/sbin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Users/lsj/Library/Application Support/Trae CN/User/globalStorage/github.copilot-chat/debugCommand
+  /Users/lsj/.nvm/versions/node/v18.17.0/bin:/Users/lsj/.nvm/versions/node/v20.20.1/bin:/Users/lsj/.nvm/versions/node/v20.20.1/bin:/Users/lsj/.nvm/versions/node/v24.14.0/bin:/Users/lsj/.nvm/versions/node/v24.14.0/bin:/Users/lsj/.nvm/versions/node/v22.17.1/bin:/Users/lsj/.nvm/versions/node/v18.20.2/bin:/Users/lsj/Downloads/flutter/flutter/bin:/usr/local/bin:/usr/local/sbin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Trae CN.app/Contents/Resources/app/bin:/Users/lsj/.local/bin:/Users/lsj/.nvm/versions/node/v18.20.2/bin:/Users/lsj/Downloads/flutter/flutter/bin:/usr/local/sbin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Users/lsj/Library/Application Support/Trae CN/User/globalStorage/github.copilot-chat/debugCommand
 
 Yarn version: 
   1.22.4
 
 Node version: 
-  18.20.2
+  18.17.0
 
 Platform: 
   darwin x64
 
 Trace: 
-  Error: EPERM: operation not permitted, mkdir '/Users/lsj/Downloads/lenovoEService/Environments/Node/Yarn/cache/v6/npm-vue-tsc-2.2.12-5f719b08ef7390a763c1a20169ca5c9d09d55688-integrity'
+  Error: EACCES: permission denied, mkdir '/Users/lsj/Downloads/vue3/homework/node_modules/pinia/node_modules'
 
 npm manifest: 
   {
