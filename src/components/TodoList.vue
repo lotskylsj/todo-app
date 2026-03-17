@@ -16,12 +16,7 @@
           <option value="high">高优先级</option>
           <option value="medium" >中优先级</option>
           <option value="low">低优先级</option>
-          <option value="loading" >
-            <svg class="animate-spin w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-              正在获取AI优先级...
-          </option>
+          <option value="loading">正在获取AI优先级...</option>
         </select>
         <button
           @click="addTodo"

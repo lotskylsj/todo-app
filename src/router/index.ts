@@ -33,12 +33,6 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
-            path: '/product-search',
-            name: 'ProductSearch',
-            component: () => import('../views/ProductSearchView.vue'),
-            meta: { requiresAuth: true }
-        },
-        {
             path: '/user-info',
             name: 'UserInfo',
             component: () => import('../views/UserInfoView.vue'),

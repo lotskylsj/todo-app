@@ -52,23 +52,6 @@
           </div>
         </router-link>
         
-        <!-- 产品查找模块 -->
-        <router-link to="/product-search" class="block">
-          <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border-l-4 border-purple-500">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-xl font-semibold text-gray-800">产品查找</h3>
-                <p class="text-gray-600 mt-2">根据ID查找产品信息</p>
-              </div>
-              <div class="bg-purple-100 p-3 rounded-full">
-                <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </router-link>
-        
         <!-- 用户信息模块 -->
         <router-link to="/user-info" class="block">
           <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border-l-4 border-orange-500">
