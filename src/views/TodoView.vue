@@ -22,7 +22,7 @@
         </button>
       </div>
       
-      <div class="bg-white rounded-xl shadow-lg p-8 max-w-md mx-auto">
+      <div class="bg-white rounded-xl shadow-lg p-8 mx-auto">
         <h2 class="text-2xl font-semibold mb-6 text-center">待办事项</h2>
         <TodoList />
       </div>

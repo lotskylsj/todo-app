@@ -42,13 +42,6 @@
         结果: {{ totalSubtract }}
       </div>
     </div>
-    
-    <button 
-      @click="emitSum" 
-      class="bg-primary text-white px-4 py-2 rounded hover:bg-pink-600 transition-colors w-full sm:w-auto sm:self-start"
-    >
-      发送结果
-    </button>
   </div>
 </template>
 
@@ -79,12 +72,6 @@ const totalSubtract = computed(() => {
   return thirdNumber.value >= fourthNumber.value ? thirdNumber.value - fourthNumber.value : "不能相减"
 })
 
-
-
-// 发送结果
-const emitSum = () => {
-  emit('sum', totalSum.value)
-}
 </script>
 
 <style scoped>

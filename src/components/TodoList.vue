@@ -1,23 +1,50 @@
 <template>
-  <div class="todo-container w-full">
+  <div class="todo-container mx-auto p-4 bg-white rounded-lg shadow-md ">
     <div class="add-todo mb-6">
-      <div class="flex flex-wrap gap-3 items-center">
+      <div class="flex flex-wrap gap-4 items-center">
+        <!-- 用户停止输入后绑定setAiSuggestedPriority -->
         <input
           v-model="newTodo"
-          @keyup.enter="addTodo"
           type="text"
           placeholder="添加新待办事项..."
           class="flex-1 min-w-[200px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all"
         />
         <select
           v-model="selectedPriority"
+          @change="setAiSuggestedPriority"
           class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all min-w-[120px]"
         >
           <option value="high">高优先级</option>
           <option value="medium" >中优先级</option>
           <option value="low">低优先级</option>
-          <option value="loading">正在获取AI优先级...</option>
         </select>
+        <input
+          v-model="dueDate"
+          type="date"
+          :min="minDate"
+          @change="setAiSuggestedDueDate"
+          class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all min-w-[120px]"
+        />
+        <!-- 分类选择器 -->
+         <div>
+          <label for="selectedCategory" class="mr-2 font-sm text-gray-700" >分类</label>
+          <select v-model="selectedCategory" @change="setAiSuggestedCategory" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-all min-w-[120px]">
+            <option value="work">工作</option>
+            <option value="life">生活</option>
+            <option value="study">学习</option>
+            <option value="other">其他</option>
+          </select>
+         </div>
+       
+        <button
+          @click="getAiRecommendation"
+          class="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium flex items-center whitespace-nowrap"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+          AI推荐
+        </button>
         <button
           @click="addTodo"
           class="px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium flex items-center whitespace-nowrap"
@@ -27,6 +54,45 @@
           </svg>
          添加
         </button>
+      </div>
+      <!-- AI推荐卡片 -->
+      <div v-if="aiRecommendation" class="ai-recommendation bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 mt-4">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-blue-700">AI推荐</h3>
+          </div>
+          <button @click="aiRecommendation = null" class="text-gray-500 hover:text-gray-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="mb-4">
+          <div class="mt-2">
+            <span class="text-gray-700"><strong>推荐优先级：</strong></span>
+            <span class="inline-block px-2 py-1 rounded-full text-xs font-medium" :class="aiSuggestedPriority === 'high' ? 'bg-red-100 text-red-800' : aiSuggestedPriority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'">
+              {{ aiSuggestedPriority === 'high' ? '高' : aiSuggestedPriority === 'medium' ? '中' : '低' }}
+            </span>
+          </div>
+          <!-- 将时间戳转换为日期格式 -->
+           <div class="mt-2">
+            <span class="text-gray-700"><strong>推荐时间：{{ aiSuggestedDueDate }} </strong></span>
+           </div>
+           <div class="mt-2">
+            <span class="text-gray-700"><strong>推荐分类：{{ aiCategory === 'work' ? '工作' : aiCategory === 'life' ? '生活' : aiCategory === 'study' ? '学习' : '其他' }}</strong></span>
+           </div>
+        </div>
+        <div class="flex gap-2">
+          <button @click="adoptRecommendation" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm font-medium">
+            采纳
+          </button>
+          <button @click="ignoreRecommendation" class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors text-sm font-medium">
+            忽略
+          </button>
+        </div>
       </div>
     </div>
     <!-- tab页 -->
@@ -71,8 +137,15 @@
             </p>
           </div>
           <span class="text-yellow-500 font-medium flex items-center" v-if="todo.isAiSuggested">🤖 AI推荐</span>
+          <!-- 显示截止时间 -->
+          <div class="text-gray-500 text-sm">
+            截止时间：{{ todo.dueDate ? formatLocalDate(todo.dueDate) : '未设置' }}
+          </div>
           <div class="priority-badge" :class="`priority-${todo.priority}`">
             {{ todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低' }}
+          </div>
+          <div class="flex items-center gap-2 text-gray-500 text-sm">
+            {{ todo.category === 'work' ? '工作' : todo.category === 'life' ? '生活' : todo.category === 'study' ? '学习' : todo.category === 'other' ? '其他' : '未分类' }}
           </div>
           <button @click="deleteTodo(todo.id)" class="px-2 py-1 text-gray-500 hover:text-red-500 transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -124,11 +197,26 @@
       </button>
     </div>
   </div>
+  <!-- 加载状态 
+    1、当AI推荐待办事项时 显示加载状态
+    2、当AI推荐待办事项完成后 隐藏加载状态
+    3.这是一个蒙层 覆盖整个页面，显示loading动画
+  -->
+    <div class="loading-overlay" v-if="loadingAiRecommendation">
+      <!-- 加载动画 
+        使用svg图标实现loading动画
+        1.设置loading动画的大小和颜色
+      -->
+      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12a2 2 0 00-4 0 2 2 0 004 0"></path>
+      </svg>
+   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { getPriority } from '../service/AiService'
+import { getAiAnalysis } from '../service/AiService'
+import { formatLocalDate } from '../util/index'
 // 定义待办事项接口
 // 新增priority属性 用于设置待办事项的优先级 可选值为high、medium、low
 interface Todo {
@@ -138,18 +226,22 @@ interface Todo {
   priority: string // 新增优先级属性 可选值为high、medium、low  
   createdTime: number // 新增创建时间属性 用于排序
   isAiSuggested: boolean // 新增是否为AI推荐属性 用于判断是否显示AI推荐图标
+  dueDate: number // 新增待办事项的截止时间属性 用于排序
+  category: string // 新增待办事项的分类属性 用于排序
 }
 
 // 定义存储键
 const STORAGE_KEY = 'vue-todo-list'
 // 定义编辑状态
 const isEditing = ref(false)
-const loadingPriority = ref(false)
-
+const minDate = ref(formatLocalDate(new Date().getTime()))
 const editingTodoId = ref<number | null>(null)
 // 定义tab状态
 const tab = ref('all')
 const todos = ref<Todo[]>([])
+// 新增待办事项的截止时间属性 用于排序
+const dueDate = ref('')
+// 定义新增待办事项的文本
 const newTodo = ref('')
 // 定义tab项
 const tabs = [
@@ -180,8 +272,16 @@ const tabs = [
 ]
 // 定义新增待办事项的优先级
 const selectedPriority = ref('medium')
+// 定义新增待办事项的分类
+const selectedCategory = ref('other')
 // 定义 AI 推荐的优先级
 const aiSuggestedPriority = ref('')
+const aiSuggestedDueDate = ref('')
+const aiCategory = ref('')
+const isAiAdopt = ref(false)
+const loadingAiRecommendation = ref(false)
+// 定义 AI 推荐结果
+const aiRecommendation = ref<{ priority: string } | null>(null)
 // 定义过滤后的待办事项
 // 1.根据创建时间倒序排序
 const filteredTodos = computed(() => {
@@ -203,47 +303,112 @@ const loadTodos = () => {
     }
   }
 }
-// 定义保存待办事项
-const saveTodos = () => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos.value))
-}
 // 定义添加待办事项
 const addTodo = async () => {
   const text = newTodo.value.trim()
   if (!text) return
-  let priority = selectedPriority.value
-  loadingPriority.value = true
-  selectedPriority.value = 'loading'
-  try {
-    const aiPriority = await getPriority(text)
-    if (aiPriority) {
-      // 加载状态结束
-      loadingPriority.value = false
-      // AI 直接返回 high/medium/low 格式，无需转换
-      priority = aiPriority
-      aiSuggestedPriority.value = aiPriority
-      // 默认选中 AI 推荐的优先级
-      selectedPriority.value = priority
-    }
-  } catch (error) {
-    console.error('获取AI优先级失败:', error)
-    // 加载状态结束
-    loadingPriority.value = false
-  }
   todos.value.push({ 
     id: Date.now(), text, completed: false, 
-    priority, createdTime: Date.now() ,
-    isAiSuggested: true
+    priority: selectedPriority.value, createdTime: Date.now() ,
+    isAiSuggested: isAiAdopt.value,
+    dueDate: dueDate.value ? Date.parse(dueDate.value) : 0,
+    category: selectedCategory.value
   })
-  newTodo.value = ''
-  // 重置编辑状态
-  isEditing.value = false
-  // 重置 AI 推荐的优先级
-  aiSuggestedPriority.value = ''
-  // 重置新增待办事项的优先级
-  selectedPriority.value = 'medium'
+  initValues()
   saveTodos()
 }
+
+// 定义保存待办事项
+const saveTodos = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos.value))
+}
+
+// 获取AI推荐
+const getAiRecommendation = async () => {
+  if (!newTodo.value.trim()) {
+    alert('请输入待办事项内容')
+    return
+  }
+  
+  loadingAiRecommendation.value = true
+  try {
+    const newTodoText = newTodo.value.trim() + (dueDate.value !== 'NaN-NaN-NaN' && dueDate.value !== '' ? dueDate.value : '')
+    const aiAnalysisResult = await getAiAnalysis(newTodoText)
+    if (aiAnalysisResult?.priority) {
+      loadingAiRecommendation.value = false
+      aiRecommendation.value = { priority: aiAnalysisResult.priority }
+      aiSuggestedPriority.value = aiAnalysisResult.priority || 'medium'
+      selectedPriority.value = aiAnalysisResult.priority || 'medium'  
+    }
+    if (aiAnalysisResult?.date) {
+      // 格式化截止时间为YYYY-MM-DD格式
+      const date = new Date(aiAnalysisResult.date);
+      if (!isNaN(date.getTime())) {
+        aiSuggestedDueDate.value = date.toLocaleDateString();
+        dueDate.value = formatLocalDate(aiAnalysisResult.date);
+      }
+    }
+    if(aiAnalysisResult?.category) {
+       aiCategory.value = aiAnalysisResult.category || 'other'
+       selectedCategory.value = aiAnalysisResult.category || 'other'
+    }
+  } catch (error) {
+    console.error('获取AI推荐失败:', error)
+  } finally {
+    loadingAiRecommendation.value = false
+  }
+}
+
+// 采纳AI推荐
+const adoptRecommendation = () => {
+  if (aiRecommendation.value) {
+    selectedPriority.value = aiRecommendation.value.priority || 'medium'
+    selectedCategory.value = aiCategory.value || 'other'
+    dueDate.value = aiSuggestedDueDate.value || ''
+    aiRecommendation.value = null
+    aiSuggestedPriority.value = ''
+    aiCategory.value = ''
+    isAiAdopt.value = true
+    addTodo()
+  }
+}
+
+// 忽略AI推荐
+const ignoreRecommendation = () => {
+  if (aiRecommendation.value) {
+    initValues()
+  }
+}
+
+const initValues = () => {
+    aiRecommendation.value = null
+    aiSuggestedPriority.value = ''
+    aiSuggestedDueDate.value = ''
+    aiCategory.value = ''
+    newTodo.value = ''
+    selectedPriority.value = 'medium'
+    selectedCategory.value = ''
+    dueDate.value = ''
+    isAiAdopt.value = false
+}
+
+// 定义设置 AI 推荐的优先级
+const setAiSuggestedPriority = () => {
+  aiSuggestedPriority.value = selectedPriority.value
+}
+
+// 定义设置 AI 推荐的分类
+const setAiSuggestedCategory = () => {
+  aiCategory.value = selectedCategory.value
+}
+
+// 定义设置 AI 推荐的截止时间
+const setAiSuggestedDueDate = () => {
+  aiSuggestedDueDate.value = dueDate.value
+}
+
+
+
 // 定义切换待办事项状态
 const toggleTodo = async (id: number) => {
   const todo = todos.value.find(t => t.id === id)
@@ -294,6 +459,17 @@ const editTodo = (id: number) => {
   if (todo) {
     todo.text = todo.text.trim()
     todo.priority = todo.priority.trim()
+    // 重置新增待办事项的截止时间
+    if (todo.dueDate) {
+      const date = new Date(todo.dueDate);
+      if (!isNaN(date.getTime())) {
+        dueDate.value = date.toLocaleDateString();
+      } else {
+        dueDate.value = '';
+      }
+    } else {
+      dueDate.value = '';
+    }
   }
 }
 // 定义编辑保存待办事项
@@ -302,7 +478,8 @@ const saveTodo = (id: number) => {
   if (todo) {
     todo.text = todo.text.trim()
     todo.priority = todo.priority.trim()
-    // 重置编辑状态
+    // 重置新增待办事项的截止时间
+    todo.dueDate = dueDate.value ? Date.parse(dueDate.value) : 0
     isEditing.value = false
     editingTodoId.value = null
     saveTodos()
@@ -363,5 +540,17 @@ loadTodos()
 
 .priority-low {
   background-color: #10b981;
+}
+.loading-overlay{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }
 </style>
